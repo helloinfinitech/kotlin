@@ -194,7 +194,8 @@ private class UastFakeLightMethod(private val original: KtFunction, containingCl
                                 ?.toPsiType(this@UastFakeLightMethod, original, false)
                                 ?: UastErrorType,
                             this,
-                            original.language
+                            original.language,
+                            p.isVarArg
                         ) {
                             override fun getContainingFile(): PsiFile = parent.containingFile
 
