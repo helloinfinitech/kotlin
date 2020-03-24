@@ -159,7 +159,7 @@ open class KotlinUAnnotationMethod(
 
 }
 
-private class UastFakeLightMethod(private val original: KtFunction, containingClass: PsiClass) : LightMethodBuilder(
+internal class UastFakeLightMethod(internal val original: KtFunction, containingClass: PsiClass) : LightMethodBuilder(
     original.manager, original.language, original.name ?: "<no name provided>",
     LightParameterListBuilder(original.manager, original.language),
     LightModifierList(original.manager)
@@ -231,8 +231,15 @@ private class UastFakeLightMethod(private val original: KtFunction, containingCl
     override fun hashCode(): Int = original.hashCode()
 }
 
-class KotlinUMethodWithFakeLightDelegate(val original: KtFunction, containingLightClass: PsiClass, givenParent: UElement?) :
-    KotlinUMethod(UastFakeLightMethod(original, containingLightClass), original, givenParent) {
+class KotlinUMethodWithFakeLightDelegate internal constructor(
+    val original: KtFunction,
+    fakePsi: UastFakeLightMethod,
+    givenParent: UElement?
+) : KotlinUMethod(fakePsi, original, givenParent) {
+
+    constructor(original: KtFunction, containingLightClass: PsiClass, givenParent: UElement?)
+            : this(original, UastFakeLightMethod(original, containingLightClass), givenParent)
+
     override val annotations: List<UAnnotation>
         get() = original.annotationEntries.mapNotNull { it.toUElementOfType<UAnnotation>() }
 
