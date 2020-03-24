@@ -51,8 +51,8 @@ import org.jetbrains.uast.kotlin.KotlinConverter.convertDeclarationOrElement
 import org.jetbrains.uast.kotlin.declarations.KotlinUIdentifier
 import org.jetbrains.uast.kotlin.declarations.KotlinUMethod
 import org.jetbrains.uast.kotlin.declarations.KotlinUMethodWithFakeLightDelegate
-import org.jetbrains.uast.kotlin.declarations.UastFakeLightMethod
 import org.jetbrains.uast.kotlin.expressions.*
+import org.jetbrains.uast.kotlin.psi.UastFakeLightMethod
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiParameter
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiVariable
 

@@ -17,19 +17,15 @@
 package org.jetbrains.uast.kotlin.declarations
 
 import com.intellij.psi.*
-import com.intellij.psi.impl.light.*
-import com.intellij.psi.impl.light.LightParameter
 import org.jetbrains.kotlin.asJava.elements.*
-import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.utils.SmartList
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.uast.*
 import org.jetbrains.uast.java.internal.JavaUElementWithComments
 import org.jetbrains.uast.kotlin.*
+import org.jetbrains.uast.kotlin.psi.UastFakeLightMethod
 
 open class KotlinUMethod(
     psi: PsiMethod,
@@ -154,78 +150,6 @@ open class KotlinUAnnotationMethod(
     }
 
 
-}
-
-internal class UastFakeLightMethod(internal val original: KtFunction, containingClass: PsiClass) : LightMethodBuilder(
-    original.manager, original.language, original.name ?: "<no name provided>",
-    LightParameterListBuilder(original.manager, original.language),
-    LightModifierList(original.manager)
-) {
-
-    init {
-        this.containingClass = containingClass
-    }
-
-    private val _buildTypeParameterList by lazy {
-        KotlinLightTypeParameterListBuilder(this).also { paramList ->
-            for ((i, p) in original.typeParameters.withIndex()) {
-                paramList.addParameter(LightTypeParameterBuilder(p.name ?: "__no_name__", this, i))
-            }
-        }
-    }
-
-    override fun getTypeParameterList(): PsiTypeParameterList? = _buildTypeParameterList
-
-    private val paramsList: PsiParameterList by lazy {
-        object : LightParameterListBuilder(original.manager, original.language) {
-            override fun getParent(): PsiElement = this@UastFakeLightMethod
-            override fun getContainingFile(): PsiFile = parent.containingFile
-
-            init {
-                val parameterList = this
-                for ((i, p) in original.valueParameters.withIndex()) {
-                    this.addParameter(
-                        object : LightParameter(
-                            p.name ?: "p$i",
-                            p.typeReference?.getType()
-                                ?.toPsiType(this@UastFakeLightMethod, original, false)
-                                ?: UastErrorType,
-                            this,
-                            original.language,
-                            p.isVarArg
-                        ) {
-                            override fun getContainingFile(): PsiFile = parent.containingFile
-
-                            override fun getParent(): PsiElement = parameterList
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    override fun getParameterList(): PsiParameterList = paramsList
-
-    override fun getReturnType(): PsiType? {
-        val context = original.analyze()
-        val descriptor = context.get(BindingContext.DECLARATION_TO_DESCRIPTOR, original).safeAs<CallableDescriptor>() ?: return null
-        return descriptor.returnType?.toPsiType(this, original, false)
-    }
-
-    override fun getParent(): PsiElement? = containingClass
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as UastFakeLightMethod
-
-        if (original != other.original) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int = original.hashCode()
 }
 
 class KotlinUMethodWithFakeLightDelegate internal constructor(
