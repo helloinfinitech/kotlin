@@ -38,6 +38,10 @@ class MavenProject {
 
         processBuilder.directory(workingDir);
         processBuilder.redirectErrorStream(true);
+
+        System.out.println(processBuilder.command());
+        System.out.println(processBuilder.directory());
+
         Process process = processBuilder.start();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -50,7 +54,9 @@ class MavenProject {
     private void setUpEnvVars(Map<String, String> env) throws IOException {
         String mavenHome = getNotNullSystemProperty("maven.home");
         String mavenPath = mavenHome + File.separator + "bin";
-        env.put("PATH", env.get("PATH") + File.pathSeparator + mavenPath);
+        String newPath = env.get("PATH") + File.pathSeparator + mavenPath;
+        System.out.println(newPath);
+        env.put("PATH", newPath);
     }
 
     private List<String> buildCmd(String... args) {
