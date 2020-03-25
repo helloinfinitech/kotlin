@@ -10,6 +10,7 @@ import com.intellij.psi.impl.light.*
 import org.jetbrains.kotlin.asJava.elements.KotlinLightTypeParameterListBuilder
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.uast.UastErrorType
@@ -52,19 +53,7 @@ internal class UastFakeLightMethod(internal val original: KtFunction, containing
                 val parameterList = this
                 for ((i, p) in original.valueParameters.withIndex()) {
                     this.addParameter(
-                        object : LightParameter(
-                            p.name ?: "p$i",
-                            p.typeReference?.getType()
-                                ?.toPsiType(this@UastFakeLightMethod, original, false)
-                                ?: UastErrorType,
-                            this,
-                            original.language,
-                            p.isVarArg
-                        ) {
-                            override fun getContainingFile(): PsiFile = parent.containingFile
-
-                            override fun getParent(): PsiElement = parameterList
-                        }
+                        UastFakeLightParameter(p, i, this@UastFakeLightMethod, original, parameterList)
                     )
                 }
             }
@@ -93,4 +82,38 @@ internal class UastFakeLightMethod(internal val original: KtFunction, containing
     }
 
     override fun hashCode(): Int = original.hashCode()
+}
+
+internal class UastFakeLightParameter(
+    internal val ktParameter: KtParameter,
+    i: Int,
+    uastFakeLightMethod: UastFakeLightMethod,
+    ktFunction: KtFunction,
+    private val parameterList: LightParameterListBuilder
+) : LightParameter(
+    ktParameter.name ?: "p$i",
+    ktParameter.typeReference?.getType()
+        ?.toPsiType(uastFakeLightMethod, ktFunction, false)
+        ?: UastErrorType,
+    uastFakeLightMethod,
+    ktParameter.language,
+    ktParameter.isVarArg
+) {
+    override fun getContainingFile(): PsiFile = parent.containingFile
+
+    override fun getParent(): PsiElement = parameterList
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as UastFakeLightParameter
+
+        if (ktParameter != other.ktParameter) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int = ktParameter.hashCode()
+
 }

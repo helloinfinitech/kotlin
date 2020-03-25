@@ -53,6 +53,7 @@ import org.jetbrains.uast.kotlin.declarations.KotlinUMethod
 import org.jetbrains.uast.kotlin.declarations.KotlinUMethodWithFakeLightDelegate
 import org.jetbrains.uast.kotlin.expressions.*
 import org.jetbrains.uast.kotlin.psi.UastFakeLightMethod
+import org.jetbrains.uast.kotlin.psi.UastFakeLightParameter
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiParameter
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiVariable
 
@@ -503,6 +504,7 @@ internal object KotlinConverter {
                     else
                         el<UField>(buildKtOpt(original.kotlinOrigin, ::KotlinUField))
                 is KtLightParameter -> el<UParameter>(buildKtOpt(original.kotlinOrigin, ::KotlinUParameter))
+                is UastFakeLightParameter -> el<UParameter>(buildKt(original.ktParameter, ::KotlinUParameter))
                 is UastKotlinPsiParameter -> el<UParameter>(buildKt(original.ktParameter, ::KotlinUParameter))
                 is UastKotlinPsiVariable -> el<UVariable>(buildKt(original.ktElement, ::KotlinUVariable))
 
@@ -530,9 +532,7 @@ internal object KotlinConverter {
                             if (lightMethod != null)
                                 convertDeclaration(lightMethod, givenParent, expectedTypes)
                             else {
-                                val ktLightClass = original.containingClassOrObject?.toLightClass()
-                                    ?: original.containingKtFile.findFacadeClass()
-                                    ?: return null
+                                val ktLightClass = getLightClassForFakeMethod(original) ?: return null
                                 KotlinUMethodWithFakeLightDelegate(original, ktLightClass, givenParent)
                             }
                         }
@@ -568,6 +568,10 @@ internal object KotlinConverter {
         }
     }
 
+    private fun getLightClassForFakeMethod(original: KtFunction): KtLightClass? {
+        if (original.isLocal) return null
+        return (original.containingClassOrObject?.toLightClass() ?: original.containingKtFile.findFacadeClass())
+    }
 
     fun convertDeclarationOrElement(
         element: PsiElement,
@@ -617,6 +621,9 @@ internal object KotlinConverter {
         alternative uParam@{
             val lightMethod = when (val ownerFunction = element.ownerFunction) {
                 is KtFunction -> LightClassUtil.getLightClassMethod(ownerFunction)
+                    ?: getLightClassForFakeMethod(ownerFunction)
+                        ?.takeIf { !it.isAnnotationType }
+                        ?.let { UastFakeLightMethod(ownerFunction, it) }
                 is KtPropertyAccessor -> LightClassUtil.getLightClassAccessorMethod(ownerFunction)
                 else -> null
             } ?: return@uParam null

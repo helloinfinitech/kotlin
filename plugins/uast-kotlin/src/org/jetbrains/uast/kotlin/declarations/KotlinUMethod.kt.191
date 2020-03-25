@@ -27,6 +27,7 @@ import org.jetbrains.uast.*
 import org.jetbrains.uast.java.internal.JavaUElementWithComments
 import org.jetbrains.uast.kotlin.*
 import org.jetbrains.uast.kotlin.psi.UastFakeLightMethod
+import org.jetbrains.uast.kotlin.psi.UastFakeLightParameter
 
 open class KotlinUMethod(
     psi: PsiMethod,
@@ -65,7 +66,13 @@ open class KotlinUMethod(
     override val uastParameters by lz {
         val lightParams = psi.parameterList.parameters
         val receiver = receiver ?: return@lz lightParams.map {
-            KotlinUParameter(it, (it as? KtLightElement<*, *>)?.kotlinOrigin, this)
+            KotlinUParameter(
+                it, when (it) {
+                    is KtLightElement<*, *> -> it.kotlinOrigin
+                    is UastFakeLightParameter -> it.ktParameter
+                    else -> null
+                }, this
+            )
         }
         val receiverLight = lightParams.firstOrNull() ?: return@lz emptyList<UParameter>()
         val uParameters = SmartList<UParameter>(KotlinReceiverUParameter(receiverLight, receiver, this))

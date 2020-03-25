@@ -657,12 +657,12 @@ class KotlinUastApiTest : AbstractKotlinUastTest() {
                 for (parameter in method.uastParameters) {
                     assertNotNull("parameter ${parameter.name} should have source", parameter.sourcePsi)
                     assertEquals(
-                        "parameter ${parameter.name} should be equals to converted from sourcePsi",
+                        "parameter ${parameter.name} of method ${method.name} should be equals to converted from sourcePsi",
                         parameter,
                         parameter.sourcePsi.toUElement()
                     )
                     assertEquals(
-                        "parameter ${parameter.name} should be equals to converted from javaPsi",
+                        "parameter ${parameter.name} of method ${method.name} should be equals to converted from javaPsi",
                         parameter,
                         parameter.javaPsi.toUElement()
                     )
