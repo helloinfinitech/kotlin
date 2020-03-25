@@ -71,6 +71,7 @@ internal object DefaultJsAsserter : Asserter {
         fail(message, null)
     }
 
+    @SinceKotlin("1.4")
     override fun fail(message: String?, cause: Throwable?): Nothing {
         failWithMessage({ message }, cause)
     }
