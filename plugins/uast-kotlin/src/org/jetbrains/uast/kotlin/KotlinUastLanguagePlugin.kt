@@ -53,7 +53,6 @@ import org.jetbrains.uast.kotlin.declarations.KotlinUMethod
 import org.jetbrains.uast.kotlin.declarations.KotlinUMethodWithFakeLightDelegate
 import org.jetbrains.uast.kotlin.expressions.*
 import org.jetbrains.uast.kotlin.psi.UastFakeLightMethod
-import org.jetbrains.uast.kotlin.psi.UastFakeLightParameter
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiParameter
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiVariable
 
@@ -504,7 +503,6 @@ internal object KotlinConverter {
                     else
                         el<UField>(buildKtOpt(original.kotlinOrigin, ::KotlinUField))
                 is KtLightParameter -> el<UParameter>(buildKtOpt(original.kotlinOrigin, ::KotlinUParameter))
-                is UastFakeLightParameter -> el<UParameter>(buildKt(original.ktParameter, ::KotlinUParameter))
                 is UastKotlinPsiParameter -> el<UParameter>(buildKt(original.ktParameter, ::KotlinUParameter))
                 is UastKotlinPsiVariable -> el<UVariable>(buildKt(original.ktElement, ::KotlinUVariable))
 

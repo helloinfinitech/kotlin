@@ -34,7 +34,7 @@ import org.jetbrains.uast.*
 import org.jetbrains.uast.kotlin.expressions.KotlinLocalFunctionULambdaExpression
 import org.jetbrains.uast.kotlin.expressions.KotlinUElvisExpression
 import org.jetbrains.uast.kotlin.internal.KotlinUElementWithComments
-import org.jetbrains.uast.kotlin.psi.UastFakeLightParameter
+import org.jetbrains.uast.kotlin.psi.UastKotlinPsiParameter
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiVariable
 
 abstract class KotlinAbstractUElement(private val givenParent: UElement?) : KotlinUElementWithComments,
@@ -96,7 +96,7 @@ abstract class KotlinAbstractUElement(private val givenParent: UElement?) : Kotl
                         ?.toLightSetter()?.parameterList?.parameters?.firstOrNull() ?: parent
             }
         }
-        if ((psi is UastKotlinPsiVariable || psi is UastFakeLightParameter) && parent != null) {
+        if ((psi is UastKotlinPsiVariable || psi is UastKotlinPsiParameter) && parent != null) {
             parent = parent.parent
         }
 

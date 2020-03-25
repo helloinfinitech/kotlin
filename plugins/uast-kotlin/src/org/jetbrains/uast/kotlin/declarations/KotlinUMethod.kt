@@ -26,7 +26,7 @@ import org.jetbrains.uast.*
 import org.jetbrains.uast.java.internal.JavaUElementWithComments
 import org.jetbrains.uast.kotlin.*
 import org.jetbrains.uast.kotlin.psi.UastFakeLightMethod
-import org.jetbrains.uast.kotlin.psi.UastFakeLightParameter
+import org.jetbrains.uast.kotlin.psi.UastKotlinPsiParameter
 
 open class KotlinUMethod(
     psi: PsiMethod,
@@ -68,7 +68,7 @@ open class KotlinUMethod(
             KotlinUParameter(
                 it, when (it) {
                     is KtLightElement<*, *> -> it.kotlinOrigin
-                    is UastFakeLightParameter -> it.ktParameter
+                    is UastKotlinPsiParameter -> it.ktParameter
                     else -> null
                 }, this
             )
