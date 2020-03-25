@@ -56,7 +56,7 @@ class KotlinCodeBlockModificationListener(project: Project) : PsiTreeChangePrepr
 
     init {
         val model = PomManager.getModel(project)
-        val messageBusConnection = project.messageBus.connect()
+        val messageBusConnection = project.messageBus.connect(project)
 
         val psiManager = PsiManager.getInstance(project) as PsiManagerImpl
         psiManager.addTreeChangePreprocessor(this)

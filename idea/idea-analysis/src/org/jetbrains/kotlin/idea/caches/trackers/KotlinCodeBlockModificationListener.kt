@@ -72,7 +72,7 @@ class KotlinCodeBlockModificationListener(
 
     init {
         val model = PomManager.getModel(project)
-        val messageBusConnection = project.messageBus.connect()
+        val messageBusConnection = project.messageBus.connect(project)
 
         if (isLanguageTrackerEnabled) {
             (PsiManager.getInstance(project) as PsiManagerImpl).addTreeChangePreprocessor(this)

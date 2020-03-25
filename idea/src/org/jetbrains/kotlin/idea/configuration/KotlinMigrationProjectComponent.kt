@@ -12,7 +12,7 @@ import com.intellij.openapi.startup.StartupActivity
 class KotlinMigrationProjectComponent : StartupActivity {
 
     override fun runActivity(project: Project) {
-        val connection = project.messageBus.connect()
+        val connection = project.messageBus.connect(project)
         connection.subscribe(ProjectDataImportListener.TOPIC, ProjectDataImportListener {
             KotlinMigrationProjectService.getInstanceIfNotDisposed(project)?.onImportFinished()
         })

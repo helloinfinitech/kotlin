@@ -31,7 +31,7 @@ class LibraryModificationTracker(project: Project) : SimpleModificationTracker()
     }
 
     init {
-        val connection = project.messageBus.connect()
+        val connection = project.messageBus.connect(project)
         connection.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
                 events.filter(::isRelevantEvent).let { createEvents ->

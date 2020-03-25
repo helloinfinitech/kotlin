@@ -42,7 +42,7 @@ class KotlinMigrationProjectComponent(val project: Project) {
     private var importFinishListener: ((MigrationTestState?) -> Unit)? = null
 
     init {
-        val connection = project.messageBus.connect()
+        val connection = project.messageBus.connect(project)
         connection.subscribe(ProjectDataImportListener.TOPIC, ProjectDataImportListener {
             getInstanceIfNotDisposed(project)?.onImportFinished()
         })

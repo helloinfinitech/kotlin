@@ -55,7 +55,7 @@ class KotlinPackageContentModificationListener : StartupActivity {
     }
 
     override fun runActivity(project: Project) {
-        val connection = project.messageBus.connect()
+        val connection = project.messageBus.connect(project)
         connection.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun before(events: MutableList<out VFileEvent>) = onEvents(events, false)
             override fun after(events: List<VFileEvent>) = onEvents(events, true)
